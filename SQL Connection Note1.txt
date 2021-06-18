@@ -1,0 +1,78 @@
+Imports System.Data.Common
+Imports IBM.Data.DB2
+
+Public Class DBConnection
+    Private _database As String
+    Private _username As String
+    Private _password As String
+    Private _mycommand As DbCommand
+    Private _myconnstr As String
+    Private _mydbconn As DBConnection
+    Private _da As DbDataAdapter
+    Sub New()
+        ClearInformation()
+    End Sub
+    Sub New(ByVal db As String, ByVal uname As String, ByVal upass As String)
+        Me.New
+        _database = db
+        _username = uname
+        _password = upass
+    End Sub
+#Region "DB Properties"
+    Public ReadOnly Property DBConn() As DBConnection
+        Get
+            If _mydbconn Is Nothing And Not String.IsNullOrEmpty(ConnectionStr) Then
+                _mydbconn = New DBConnection(Database, User, Access)
+            End If
+            Return _mydbconn
+        End Get
+    End Property
+#End Region
+#Region "Properties"
+    Public ReadOnly Property Database() As String
+        Get
+            Return _database
+        End Get
+    End Property
+    Public ReadOnly Property User() As String
+        Get
+            Return _username
+        End Get
+    End Property
+    Public ReadOnly Property Access() As String
+        Get
+            Return _password
+        End Get
+    End Property
+    Public ReadOnly Property ConnectionStr() As String
+        Get
+            If String.IsNullOrEmpty(_myconnstr) Then
+                _myconnstr = ReturnConnectionValues()
+            End If
+            Return _myconnstr
+        End Get
+    End Property
+#End Region
+#Region "Sub Routines and Functions"
+    Private Sub ClearInformation()
+        _database = String.Empty
+        _username = String.Empty
+        _password = String.Empty
+    End Sub
+    Private Function ReturnConfigSetting(ByVal settingname As String) As String
+        Return System.Configuration.ConfigurationManager.AppSettings(settingname)
+    End Function
+    Private Function ReturnConnectionValues() As String
+        Dim csstr As String = ""
+        If Not String.IsNullOrEmpty(Access) _
+                And Not String.IsNullOrEmpty(User) And Not String.IsNullOrEmpty(Database) Then
+            csstr = String.Format("database={0};uid={1};pwd={2};", Database, User, Access)
+        Else
+            csstr = String.Format("database={0};uid={1};pwd={2};", ReturnConfigSetting("dbName"),
+                                  ReturnConfigSetting("dbUser"), ReturnConfigSetting("dbPwd"))
+        End If
+        Return csstr
+    End Function
+#End Region
+
+End Class

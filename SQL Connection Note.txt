@@ -1,0 +1,40 @@
+Private Sub ExecuteCommand(ByVal cn As DbConnection, ByVal executeTxn As DbTransaction, ByVal SQL As String)
+    Try
+        Dim cmd As DbCommand = cn.CreateCommand()
+        cmd.CommandText = SQL
+        cmd.CommandType = CommandType.Text
+        cmd.Transaction = executeTxn
+        Dim rowsAffected As Integer = 0
+        rowsAffected = cmd.ExecuteNonQuery()
+    Catch e As DB2Exception
+        If executeTxn IsNot Nothing Then executeTxn.Rollback()
+        Throw
+    Finally
+    End Try
+End Sub
+
+Private Shared Function CreateDbDataAdapter(ByVal providerName As String, ByVal connection As DbConnection, ByVal queryString As String) As DbDataAdapter
+    Dim dataAdapter As DbDataAdapter = Nothing
+    Dim selCmd As DbCommand = Nothing
+
+    If queryString IsNot Nothing Then
+
+        Try
+            Dim factory As DbProviderFactory = DbProviderFactories.GetFactory(providerName)
+            dataAdapter = factory.CreateDataAdapter()
+            selCmd = connection.CreateCommand()
+            selCmd.CommandText = queryString
+            selCmd.CommandType = CommandType.Text
+            dataAdapter.SelectCommand = selCmd
+        Catch ex As Exception
+
+            If connection IsNot Nothing Then
+                connection = Nothing
+            End If
+
+            Console.WriteLine(ex.Message)
+        End Try
+    End If
+
+    Return dataAdapter
+End Function

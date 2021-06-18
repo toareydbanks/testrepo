@@ -1,0 +1,30 @@
+Class SurroundingClass
+    Protected Sub GridView1_RowCreated(ByVal sender As Object, ByVal e As GridViewRowEventArgs)
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            Dim firstCell = e.Row.Cells(1)
+            firstCell.Controls.Clear()
+            Dim btn_Check As Button = New Button()
+            btn_Check.ID = "btn_Check"
+            btn_Check.Text = firstCell.Text
+            btn_Check.Click += New EventHandler(AddressOf btn_Check_Click)
+            firstCell.Controls.Add(btn_Check)
+        End If
+    End Sub
+
+    Protected Sub btn_Check_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Response.Write("btn_Check_Click event called")
+    End Sub
+End Class
+
+ Protected Sub dgEmployees_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+        For Each dr As GridViewRow In dgEmployees.Rows
+
+            If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim btn As Button = New Button()
+                btn.Text = "Approve"
+                btn.ID = "Approve"
+                'btn.Click += New EventHandler(Approve_Click)
+                dgEmployees.Columns.Add(btn)
+            End If
+        Next
+    End Sub

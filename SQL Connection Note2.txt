@@ -1,0 +1,192 @@
+Imports System.Data
+Imports System.Drawing
+Public Class _Default1
+    Inherits System.Web.UI.Page
+    Public userid As String = "130982"
+    Public dbcn As New TRISData("DB2PLOC", "tr1sprod", "tr1sprod")
+    'Public dbcn As New TRISData("DB2BLOC", "tr1stest", "tr1stest")
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        If Not Page.IsPostBack Then
+            'FullScreenMode()
+            SetCollectionPeriod()
+            SetSupervisors(userid, ddlCollectionPeriod.Items(0).Value)
+            GetEmployees(userid, Convert.ToInt32(lbSupervisors.Items(0).Value.ToString()), ddlCollectionPeriod.Items(0).Value)
+        End If
+    End Sub
+#Region "List Boxes"
+    Protected Sub lbSupervisors_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim supervisorid = (From index In Me.lbSupervisors.GetSelectedIndices() Select
+                             Me.lbSupervisors.Items(index).Value).FirstOrDefault
+        Dim datevalue As String = ddlCollectionPeriod.SelectedValue
+        GetEmployees(userid, supervisorid, datevalue)
+    End Sub
+#End Region
+#Region "Drop Down Boxes"
+    Protected Sub ddlCollectionPeriod_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim datevalue As String = CType(sender, DropDownList).SelectedValue
+        SetSupervisors(userid, datevalue)
+        GetEmployees(userid, Convert.ToInt32(lbSupervisors.Items(0).Value.ToString()), ddlCollectionPeriod.Items(0).Value)
+    End Sub
+#End Region
+#Region "Grid Views"
+    Protected Sub dgEmployees_DataBound(sender As Object, e As EventArgs)
+        'Dim nfields As String() = {"Employees", "Approved", "Entered Time"}
+        'Dim row As New GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal)
+        'For Each str As String In nfields
+        '    Dim cell As New TableHeaderCell()
+        '    cell.Text = str
+        '    cell.ColumnSpan = If(str = "Employees", 2, If(str = "Approved", 1, 4))
+        '    row.Controls.Add(cell)
+        'Next
+        'row.BackColor = ColorTranslator.FromHtml("#3AC0F2")
+        'dgEmployees.HeaderRow.Parent.Controls.AddAt(0, row)
+        Dim aa = 1
+    End Sub
+    Protected Sub dgEmployees_RowCreated(sender As Object, e As GridViewRowEventArgs)
+        If e.Row.RowType = DataControlRowType.DataRow Then
+
+        End If
+    End Sub
+    Protected Sub dgEmployees_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            e.Row.Attributes("onmouseover") = "this.style.backgroundColor='aquamarine';"
+            e.Row.Attributes("onmouseout") = "this.style.backgroundColor='#FFFFFF';"
+            For i As Integer = 0 To (e.Row.Cells.Count - 1)
+                'e.Row.Cells(i).CssClass = If(i = 0, "columnsnumcss", "columnscss")
+            Next
+        End If
+        'If e.Row.RowType = DataControlRowType.Header Then
+        '    Dim cbx As CheckBox = CType(e.Row.FindControl("cbSelectAll"), CheckBox)
+        '    If Not cbx Is Nothing Then
+        '        cbx.Attributes.Add("onclick", "javascript:SelectAll('" & (CType(e.Row.FindControl("cbSelectAll"), CheckBox)).ClientID & "')")
+        '    End If
+        'End If
+
+    End Sub
+    Protected Sub dgEmployees_SelectedIndexChanged(sender As Object, e As EventArgs)
+        'For Each row As GridViewRow In dgEmployees.Rows
+        '    If row.RowIndex = dgEmployees.SelectedIndex Then
+        '        row.BackColor = ColorTranslator.FromHtml("#A1DCF2")
+        '    Else
+        '        row.BackColor = ColorTranslator.FromHtml("#FFFFFF")
+        '    End If
+        'Next
+    End Sub
+#End Region
+#Region "Check Boxes"
+    Protected Sub ckShowEmployeeNoTime_CheckedChanged(sender As Object, e As EventArgs)
+        Dim datevalue As String = CType(sender, DropDownList).SelectedValue
+        Dim supervisorid = (From index In Me.lbSupervisors.GetSelectedIndices() Select
+                             Me.lbSupervisors.Items(index).Value).FirstOrDefault
+        GetEmployees(userid, supervisorid, datevalue)
+    End Sub
+#End Region
+#Region "Sub Routines"
+    Protected Sub FullScreenMode()
+        Dim FullScreenScript As StringBuilder = New StringBuilder()
+        FullScreenScript.Append("if(this.name != 'InFullScreen')")
+        FullScreenScript.Append("{" & Environment.NewLine)
+        FullScreenScript.Append("window.open(window.location.href,'InFullScreen','width=' + screen.availWidth + 'px, height=' + screen.availHeight + 'px, menubar=yes,toolbar=yes,status=yes,scrollbars=auto');" & Environment.NewLine)
+        FullScreenScript.Append("}")
+        Me.ClientScript.RegisterStartupScript(Me.[GetType](), "InFullScreen", FullScreenScript.ToString(), True)
+    End Sub
+    Private Sub SetCollectionPeriod()
+        Dim lst As List(Of String) = New List(Of String)
+        For Each row As DataRow In dbcn.GetCollectionPeriod.Rows
+            AddItems(ddlCollectionPeriod, row("PAY_PER_START_DATE").ToShortDateString())
+        Next
+    End Sub
+    Private Sub SetSupervisors(ByVal userid As String, ByVal datestr As String)
+        lbSupervisors.Items.Clear()
+        For Each row As DataRow In dbcn.GetSupervisors(userid, datestr).rows
+            AddItems(lbSupervisors, row("emp_name").ToString.Trim, row("SUPERVISOR_ID").ToString.Trim)
+        Next
+    End Sub
+    Private Sub GetEmployees(ByVal userid As String, ByVal supid As String, ByVal datestr As String)
+        Dim peersid As String = GetAllPeers(supid, datestr)
+        Dim dt As DataTable = dbcn.GetEmployees(peersid, datestr)
+        For Each col As DataColumn In dt.Columns
+            SetDataGridColumns(dgEmployees, ReturnBoundedField(col))
+        Next
+        SetDataGrid(dgEmployees, dt)
+    End Sub
+    Private Sub SetDataGrid(ByRef gv As GridView, ByVal dt As DataTable)
+        gv.DataSource = dt
+        gv.DataBind()
+    End Sub
+    Private Function ReturnBoundedField(ByVal fieldname As String) As BoundField
+        Dim bf As BoundField = New BoundField()
+        bf.HeaderText = StrConv(fieldname, VbStrConv.ProperCase)
+        bf.Visible = True
+        Return bf
+    End Function
+    Private Function ReturnBoundedField(ByVal dc As DataColumn) As BoundField
+        Dim bf As BoundField = New BoundField()
+        Dim headername As String = ""
+        bf.DataField = dc.ColumnName
+        If dc.ColumnName.ToLower.Contains("emp_") Then
+            headername = ReturnProperFormatedHeader(dc.ColumnName, "emp_")
+        ElseIf dc.ColumnName.ToLower.EndsWith("_hours") Then
+            headername = ReturnProperFormatedHeader(dc.ColumnName, New List(Of String)({"_hours", "_"}),
+                                                    New List(Of String)({"", " "}))
+        Else
+            headername = ReturnProperFormatedHeader(dc.ColumnName, "_")
+        End If
+        bf.HeaderText = headername
+        bf.Visible = Not (dc.ColumnName.ToLower.Contains("holiday") Or dc.ColumnName.ToLower.Contains("flex") Or dc.ColumnName = "APPR_IND")
+        Return bf
+    End Function
+    Private Function ReturnProperFormatedHeader(ByVal headerstr As String, ByVal findstr As String, Optional ByVal replacestr As String = "") As String
+        Return ReturnProperFormatedHeader(headerstr, New List(Of String)({findstr}), New List(Of String)({replacestr}))
+    End Function
+    Private Function ReturnProperFormatedHeader(ByVal headerstr As String, ByVal findstrs As List(Of String), ByVal replacestrs As List(Of String)) As String
+        Dim headername As String = headerstr
+        For Each str As String In findstrs
+            Dim rst = replacestrs(findstrs.IndexOf(str))
+            headername = StrConv(headername.ToLower.Replace(str, rst), VbStrConv.ProperCase)
+        Next
+        Return headername
+    End Function
+    Private Sub SetDataGridColumns(ByRef gv As GridView, ByVal bf As BoundField)
+        gv.Columns.Add(bf)
+    End Sub
+    Private Function GetAllPeers(ByVal supid As String, ByVal datestr As String) As String
+        Dim peersstr As New StringBuilder
+        For Each row As DataRow In dbcn.GetPeers(supid, datestr)
+            If Not (row(0) = userid) Then
+                If peersstr.Length > 0 Then
+                    peersstr.Append(", ")
+                End If
+                peersstr.Append(row(0))
+            End If
+        Next
+        Return peersstr.ToString
+    End Function
+    Private Sub AddItems(ByRef obj As Object, ByVal datestr As String)
+        AddItems(obj, datestr, datestr)
+    End Sub
+    Private Sub AddItems(ByRef obj As Object, ByVal strtext As String, ByVal strvalue As String)
+        Dim lst As ListItem = New ListItem(strtext, strvalue)
+        obj.Items.Add(lst)
+    End Sub
+
+    Private Function ReturnValue(ByVal obj As Object, Optional ByVal lstindex As Integer = 0)
+        Return CType(obj, ListItem).Value
+    End Function
+
+    Protected Sub btnSave_Click(sender As Object, e As EventArgs)
+        For Each row As GridViewRow In dgEmployees.Rows
+            If row.RowType = DataControlRowType.DataRow Then
+                Dim c As CheckBox = CType(row.FindControl("cbSelection"), CheckBox)
+                Dim cbValue As Boolean = c.Checked
+                If cbValue = True Then
+
+                End If
+            End If
+        Next
+    End Sub
+
+
+#End Region
+End Class

@@ -1,0 +1,81 @@
+    node {        
+        properties([disableConcurrentBuilds()])
+        try{
+        podTemplate {
+            node('BPDev_node') {
+                boolean failedJob = false
+
+                stage('Checkout') {
+                    checkout scm
+                }
+
+                stage('Restore') {
+                    bat '"C:\\Nuget\\v5.8.1\\nuget.exe" restore Ameren.COA.Common\\Ameren.COA.Common.sln'
+                }
+
+                stage('Build') {
+                    bat '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\MSBuild\\Current\\Bin\\MSBuild.exe" Ameren.COA.Common\\Ameren.COA.Common.sln /P:Configuration=Release  /nodeReuse:false'
+                }
+
+               if (env.BRANCH_NAME.startsWith('release/')) {
+                stage('Package') {
+                    String
+                    bat '"C:\\Nuget\\v5.8.1\\nuget.exe" pack Ameren.COA.Common\\ -Version 1.0.%BUILD_NUMBER% -Symbols -SymbolPackageFormat snupkg -Properties Configuration=Release'
+                }
+
+                stage ('Upload to Artifactory') {
+
+                def usernameLocal, passwordLocal
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'artifactorycreds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME']]) {
+                usernameLocal = env.USERNAME
+                passwordLocal = env.PASSWORD
+
+                def server = Artifactory.server 'artifactory_cluster'
+                def uploadSpec = """{
+                "files": [
+                    {
+                    "pattern": "${WORKSPACE}/Ameren.COA.Common*.nupkg",
+                    "target": "nuget/COA/COA_Common-${env.BUILD_NUMBER}/"
+                    },
+                    {
+                    "pattern": "${WORKSPACE}/Ameren.COA.Common*.snupkg",
+                    "target": "nuget/COA/COA_Common-${env.BUILD_NUMBER}/"
+                    }
+
+                ]
+                }"""
+                server.upload spec: uploadSpec
+  
+	  	            } 
+                }
+
+                
+                } // End Release Branch
+
+                stage('Notify') {
+                    notify(failedJob)
+                }
+                
+                }
+            }
+        } catch (e) {
+        currentBuild.result = "FAILED"
+        notify(true)
+        throw e
+        }
+    } //Node End 
+
+    def notify(failedJob) {
+        def subject, body
+        def notifyEmail = "EBrown5@ameren.com, q157489@ameren.com,ILedezma@ameren.com"
+
+        if(failedJob){
+            subject = "Failed Deployment. Job Name: " + env.JOB_NAME + " Build: " + env.BUILD_NUMBER
+            body = "<p>A build triggered in Jenkins has failed in the " + env.STAGE_NAME + " stage.</p>" + "<p>Check console output at <a href=\"" + env.BUILD_URL + "\">Jenkins</a>"
+        } else{
+            subject = "Successful Deployment. Job Name: " + env.JOB_NAME + " Build: " +  env.BUILD_NUMBER
+            body = "<p>A build triggered in Jenkins has succeeded.</p>" + "<p>Check console output at <a href=\"" + env.BUILD_URL + "\">Jenkins</a>"
+        }
+
+        emailext(attachLog: true, compressLog: false, mimeType: 'text/html', subject: subject, body: body, from: 'Jenkins@ameren.com', to: notifyEmail)
+    }

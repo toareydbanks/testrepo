@@ -1,0 +1,20 @@
+   Protected Sub gvEmployees_DataBound(sender As Object, e As EventArgs)
+        '
+    End Sub
+    Protected Sub gvEmployees_RowCreated(sender As Object, e As GridViewRowEventArgs)
+        If e.Row.RowType = DataControlRowType.DataRow Then
+
+        End If
+    End Sub
+    Protected Sub gvEmployees_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            e.Row.Attributes("onclick") = Page.ClientScript.GetPostBackClientHyperlink(gvEmployees, "Select$" & e.Row.RowIndex)
+            e.Row.Attributes("style") = "cursor:pointer"
+        End If
+    End Sub
+    Protected Sub gvEmployees_SelectedIndexChanged(sender As Object, e As EventArgs)
+        SetCurrentGridRow(gvEmployees)
+        Dim index As Integer = gvEmployees.SelectedRow.RowIndex
+        Dim name As String = gvEmployees.SelectedRow.Cells(2).Text
+        lblDetailEmployee.Text = name
+    End Sub

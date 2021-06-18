@@ -1,0 +1,34 @@
+Imports System.Drawing
+
+Public Class _Default1
+    Inherits System.Web.UI.Page
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        'Dim fields As String() = {"Number", "Name", "utStraight", "utOT", "utSymbol", "utTotal", "atStraight", "atOT", "atSymbol", "atTotal"}
+        'Dim dt As New DataTable()
+        'If Not Me.IsPostBack Then
+        '    For Each str As String In fields
+        '        Dim dc As New DataColumn()
+        '        dc.ColumnName = str
+        '        dc.Caption = str.Replace("ut", "").Replace("at", "")
+        '        dt.Columns.Add(dc)
+        '    Next
+        'End If
+        'dt.Rows.Add("1", "Toarey Banks", "40.0", "0.0", "0.0", "40.0", "0.0", "0.0", "0.0", "0.0")
+        'dgEmployees.DataSource = dt
+        'dgEmployees.DataBind()
+    End Sub
+
+    'Protected Sub dgEmployees_DataBound(sender As Object, e As EventArgs) Handles dgEmployees.DataBound
+    '    'Dim nfields As String() = {"Employees", "Unaproved Time", "Appproved Time"}
+    '    'Dim row As New GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Normal)
+    '    'For Each str As String In nfields
+    '    '    Dim cell As New TableHeaderCell()
+    '    '    cell.Text = str
+    '    '    cell.ColumnSpan = If(str = "Employees", 2, 4)
+    '    '    row.Controls.Add(cell)
+    '    'Next
+    '    'row.BackColor = ColorTranslator.FromHtml("#3AC0F2")
+    '    'dgEmployees.HeaderRow.Parent.Controls.AddAt(0, row)
+    'End Sub
+End Class
