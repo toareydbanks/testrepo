@@ -1,0 +1,15 @@
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.exe
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.deps.json
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.runtimeconfig.json
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.runtimeconfig.dev.json
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.dll
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\bin\Debug\netcoreapp3.1\FormsComparision.pdb
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.csprojAssemblyReference.cache
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.Form1.resources
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.csproj.GenerateResource.cache
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.AssemblyInfoInputs.cache
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.AssemblyInfo.cs
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.csproj.CoreCompileInputs.cache
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.dll
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.pdb
+C:\Users\Q166761\Documents\Visual Studio 2019\Projects\TRISFileComparison\FormsComparision\obj\Debug\netcoreapp3.1\FormsComparision.genruntimeconfig.cache
